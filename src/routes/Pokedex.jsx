@@ -115,7 +115,11 @@ const Pokedex = () => {
           <Card
             key={pokemon.url ? pokemon.url : pokemon.pokemon.url}
             url={pokemon.url ? pokemon.url : pokemon.pokemon.url}
-            onClick={() => navigate(`/pokedex/${pokemon.name}`)}
+            onClick={() =>
+              navigate(
+                `/pokedex/${pokemon.name ? pokemon.name : pokemon.pokemon.name}`
+              )
+            }
           />
         ))}
       </div>
