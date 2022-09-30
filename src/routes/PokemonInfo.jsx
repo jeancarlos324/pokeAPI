@@ -6,14 +6,23 @@ import question from "../assets/Signo.svg";
 import destello from "../assets/destello3.png";
 import ChipInfo from "../components/Chips/ChipInfo";
 import { motion } from "framer-motion";
+import { useDispatch } from "react-redux";
+import { setLoadingScreen } from "../store/slice/loadingScreen";
 const PokemonInfo = () => {
   const [character, setCharacter] = useState([]);
   const [color, setColor] = useState([]);
   const [isActive, setIsActive] = useState(false);
   const params = useParams();
+  const dispatch = useDispatch();
+  const loaderScreen = () => dispatch(setLoadingScreen(true));
   useEffect(() => {
+    loaderScreen();
     let newURL = `https://pokeapi.co/api/v2/pokemon/${params.id}/`;
-    axios.get(newURL).then((res) => setCharacter(res.data));
+
+    axios
+      .get(newURL)
+      .then((res) => setCharacter(res.data))
+      .finally(() => dispatch(setLoadingScreen(false)));
   }, []);
 
   const newColor = () => {
@@ -30,7 +39,7 @@ const PokemonInfo = () => {
       setColor(typeColor);
     }
   };
-  console.log(character);
+  // console.log(character);
   return (
     <div
       className="h-screen w-screen flex  md:flex-row justify-start md:justify-center flex-wrap-reverse bg-gradient-to-r from-yellow-400 to-orange-600"
@@ -38,14 +47,14 @@ const PokemonInfo = () => {
         background: `linear-gradient(45deg, ${color?.[0]} 47%, ${color?.[1]} 100%)`,
       }}
     >
-      <div className="flex flex-col items-center w-full md:w-3/5 bg-white">
+      <div className="flex flex-col items-center w-full md:w-3/5 bg-[#ffffffcc] overflow-y-scroll">
         <h1
-          className="text-[60px] uppercase text-slate-200"
+          className="text-[60px] uppercase text-slate-800"
           style={{
             color: `${color?.[0]}`,
           }}
         >
-          {character.name}
+          {isActive ? character.name : "Who's that pokemon?"}
         </h1>
         <div className="flex justify-around w-full">
           <span className="text-[25px] flex flex-col uppercase items-center bg-slate-200 p-1 rounded-lg">
@@ -89,30 +98,33 @@ const PokemonInfo = () => {
             </div>
           </div>
         </div>
-        <h3 className="text-2xl">Stats</h3>
-        <div className="grid grid-cols-3 grow w-[90%] p-5 bg-slate-200 rounded-3xl">
-          {character.stats?.map((stat) => (
-            <ChipInfo
-              className="flex flex-col"
-              key={stat.stat.name}
-              title={stat.stat.name}
-              content={stat.base_stat}
-            />
-          ))}
+        <div className="w-[96%]">
+          <h3 className="text-2xl pl-3">Stats</h3>
+          <div className="grid grid-cols-3 gap-3 grow w-full p-5 bg-slate-200 rounded-3xl">
+            {character.stats?.map((stat) => (
+              <div className="w-full " key={stat.stat.name}>
+                <h1 className="uppercase">{stat.stat.name}</h1>
+                <motion.div className="w-full bg-slate-400 rounded-lg text-white">
+                  <div className="bg-blue-400 rounded-lg pl-2" style={{width:`${0.66*stat.base_stat}%`}}>{stat.base_stat}</div>
+                </motion.div>
+              </div>
+            ))}
+          </div>
         </div>
         <h3 className="text-2xl">Movements</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 overflow-y-auto h-[200px] w-full md:w-[90%]">
           {character.moves?.map((move) => (
             <motion.div
-              className="cursor-pointer rounded-lg text-white uppercase"
+              className="rounded-lg uppercase p-[3px] cursor-default"
               whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
               key={move.move.url}
               style={{
                 background: `linear-gradient(270deg, ${color?.[0]} 47%, ${color?.[1]} 100%)`,
               }}
             >
-              <ChipInfo className="flex flex-col  " content={move.move.name} />
+              <div className="bg-white rounded-md">
+                <ChipInfo className="flex flex-col" content={move.move.name} />
+              </div>
             </motion.div>
           ))}
         </div>

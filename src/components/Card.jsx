@@ -2,10 +2,13 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import ChipInfo from "./Chips/ChipInfo";
 import dataColors from "../data/dataColors.json";
+import { useDispatch } from "react-redux";
+import LoadingScreen from "./LoadingScreen";
 
-const Card = ({ url, style,onClick }) => {
+const Card = ({ url, style, onClick }) => {
   const [data, setData] = useState([]);
   const [color, setColor] = useState([]);
+  const dispatch = useDispatch();
   useEffect(() => {
     axios.get(url).then((res) => setData(res.data));
   }, []);
@@ -56,8 +59,12 @@ const Card = ({ url, style,onClick }) => {
         <div className="uppercase text-center ">
           <h3 className="text-[14px] text-slate-700">type</h3>
           <div className="flex gap-2">
-            {data.types?.map((type,index) => (
-              <span className="text-[16px] font-semibold" key={type.type.name} style={{color:`${color?.[index]}`}}>
+            {data.types?.map((type, index) => (
+              <span
+                className="text-[16px] font-semibold"
+                key={type.type.name}
+                style={{ color: `${color?.[index]}` }}
+              >
                 {type.type.name}
               </span>
             ))}
